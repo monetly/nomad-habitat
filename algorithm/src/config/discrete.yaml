@@ -1,0 +1,5 @@
+# linear and angular speed limits for the agent
+forward_distance: 0.1 #0.1 # m/s
+turn_angle: 3 #5 # degree/step
+turn_threshold: 1 #5 # degree
+forward_threshold: 0.02 #0.1 # m
