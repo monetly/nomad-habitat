@@ -98,62 +98,6 @@ class HabitatSimulator:
     def reset(self):
         self.sim.reset(self.sim._default_agent_id)
 
-    def explore(self,policy,
-                mode:str='continuous',
-                CONTEXT_WARMUP=12,
-                NUM_STEPS=600,
-                NUM_SAMPLES=8):
-        
-        WAYPOINT_INDEX=2
-        video_frames = []
-        trajectory_grid_points = []
-        obs_video = []
-        print(f"Starting exploration for {NUM_STEPS} steps...")
-        control = WaypointToActionConverter(sim=self)
-        # Exploration loop
-        for step in range(NUM_STEPS ):
-            # Get current observation
-            rgb_img = self.get_observation()
-
-            # Add to policy context
-            policy.add_observation(rgb_img)
-
-            # Get agent position and update trajectory
-            position = self.get_agent_position()
-            grid_loc = self.world_to_map(position)
-            trajectory_grid_points.append(grid_loc)
-
-            # Predict action after enough context
-            if step < CONTEXT_WARMUP:
-                # Random exploration during warmup
-                action=np.random.choice(["move_forward", "turn_left", "turn_right"])
-                print(f"Step {step}: Warmup - {action}")
-                self.step(action)
-            else:
-                result = policy.predict_waypoint(waypoint_index=WAYPOINT_INDEX, num_samples=NUM_SAMPLES)
-                waypoint, _ = result
-                waypoint/= np.linalg.norm(waypoint)*3
-                control(waypoint)
-
-
-            # Visualize
-            # Draw trajectory on map
-            map_frame = self.draw_trajectory(trajectory_grid_points)
-
-
-            obs_video.append(rgb_img)
-            video_frames.append(map_frame)
-
-
-
-        print("✓ Exploration completed.")
-        # Save video
-        output_path1 = "src/results/habitat_obs_notebook.mp4"
-        print(f"Saving video to {output_path1}...")
-        imageio.mimsave(output_path1, obs_video, fps=10)
-        print(f"✓ Video saved to {output_path1}")
-
-
     def close(self):
         """Close the simulator"""
         if self.sim:

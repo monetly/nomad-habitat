@@ -50,11 +50,29 @@ class NoMaDPolicy:
             rgb_image = PILImage.fromarray(rgb_image)
         self.context_queue.append(rgb_image)
     
-    def predict_waypoint(self, waypoint_index=2, num_samples=8 ,mask = torch.ones(1).long() ,goal = torch.randn((1, 3, *model_params["image_size"]))   ):
+    def predict_waypoint(self, waypoint_index=2, num_samples=8 ,mask = None ,goal = None):
         """Predict waypoint using the diffusion model"""
         if len(self.context_queue) <= self.context_size:
             return None
         
+        from PIL import Image as PILImage
+        if isinstance(goal, np.ndarray):
+            goal = PILImage.fromarray(goal)
+
+        if goal is None:
+            goal = torch.randn((1, 3, *self.model_params["image_size"])).to(self.device)
+        else:
+            goal = transform_images(
+                [goal], 
+                self.model_params["image_size"], 
+                center_crop=False
+            ).to(self.device)
+
+        if mask is None:
+            mask = torch.ones(1).long().to(self.device)  # Ignore the goal
+        else:
+            mask = torch.zeros(1).long().to(self.device)
+
         # Transform images
         obs_images = transform_images(
             list(self.context_queue), 
@@ -63,9 +81,9 @@ class NoMaDPolicy:
         )
         obs_images = obs_images.to(self.device)
         
+
         # Create fake goal (exploration mode)
-        fake_goal = torch.randn((1, 3, *self.model_params["image_size"])).to(self.device)
-        mask = torch.ones(1).long().to(self.device)  # Ignore the goal
+
         
         # Infer action
         with torch.no_grad():
@@ -73,7 +91,7 @@ class NoMaDPolicy:
             obs_cond = self.model(
                 'vision_encoder', 
                 obs_img=obs_images, 
-                goal_img=fake_goal, 
+                goal_img=goal, 
                 input_goal_mask=mask
             )
             

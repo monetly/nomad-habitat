@@ -29,3 +29,4 @@ T_{\text{waypoint} \rightarrow \text{habitat}}
 \mathbf{p}_{\text{waypoint}}
 $$
 
+python -m habitat_sim.utils.datasets_download --username monetLittlepumpkin --password 8956237Pl. --uids hssd-hab --data-path data/

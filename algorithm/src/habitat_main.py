@@ -77,7 +77,7 @@ class HabitatSimulator:
 
     def step(self, action):
         """Execute an action in the simulator"""
-        self.sim.step(action)
+        return self.sim.step(action)
 
     def get_observation(self):
         """Get current RGB observation"""
