@@ -1,3 +1,4 @@
 key:41c54c84cebda82055aecdc8cfdd34b3
 id:37dae4c4fe070479
 python -m habitat_sim.utils.datasets_download --username 37dae4c4fe070479 --password 41c54c84cebda82055aecdc8cfdd34b3 --uids hm3d_minival_v0.2
+python -m habitat_sim.utils.datasets_download --username monetLittlepumpkin --password 8956237Pl. --uids hssd-hab --data-path data/
